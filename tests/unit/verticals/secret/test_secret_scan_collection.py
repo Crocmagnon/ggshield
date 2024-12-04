@@ -164,7 +164,7 @@ class TestComputeIgnoreReason:
 
     def test_ignore_ignored_detector(self):
         """
-        GIVEN an policy break matching an ignored detector in config
+        GIVEN a policy break matching an ignored detector in config
         WHEN computing the ignore reason
         THEN it's not None
         """
@@ -183,4 +183,4 @@ class TestComputeIgnoreReason:
         """
         policy_break = PolicyBreakFactory(known_secret=True)
         config = SecretConfig(ignore_known_secrets=ignore_known)
-        assert (compute_ignore_reason(policy_break, config) is not None) is ignore_known
+        assert bool(compute_ignore_reason(policy_break, config)) is ignore_known

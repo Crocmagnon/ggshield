@@ -10,7 +10,7 @@ from tests.factory_constants import DETECTOR_NAMES, MATCH_NAMES
 
 
 def get_line_index(content, index):
-    """Return the index of the line containing the caracter at the given index"""
+    """Return the index of the line containing the character at the given index"""
     current_line_index = 0
     lines = content.splitlines(keepends=True)
     while True:
