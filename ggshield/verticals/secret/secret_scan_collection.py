@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import Counter
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -38,7 +38,7 @@ def compute_ignore_reason(
     ignore_reason = None
     if policy_break.diff_kind in {DiffKind.DELETION, DiffKind.CONTEXT}:
         ignore_reason = IgnoreReason.NOT_INTRODUCED
-    if policy_break.is_excluded:
+    elif policy_break.is_excluded:
         ignore_reason = f"Excluded from backend ({policy_break.exclude_reason})"
     elif is_in_ignored_matches(policy_break, secret_config.ignored_matches or []):
         ignore_reason = IgnoreReason.IGNORED_MATCH
@@ -62,7 +62,7 @@ class Result:
     path: Path
     url: str
     policy_breaks: List[PolicyBreak]
-    ignored_policy_breaks_count_by_reason: Dict[str, int]
+    ignored_policy_breaks_count_by_reason: Counter[str]
 
     @property
     def is_on_patch(self) -> bool:
@@ -92,14 +92,14 @@ class Result:
     @classmethod
     def from_scan_result(
         cls, file: Scannable, scan_result: ScanResult, secret_config: SecretConfig
-    ):
+    ) -> "Result":
         """Creates a Result from a Scannable and a ScanResult.
         - Removes ignored policy breaks
         - replace matches by ExtendedMatches
         """
 
         to_keep = []
-        ignored_policy_breaks_count_by_reason = defaultdict(lambda: 0)
+        ignored_policy_breaks_count_by_reason = Counter()
         for policy_break in scan_result.policy_breaks:
             ignore_reason = compute_ignore_reason(policy_break, secret_config)
             if ignore_reason is not None:
